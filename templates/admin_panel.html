@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/main.js" defer></script>
+</head>
+<body>
+    <header style="position: relative;">
+        <h1>Crime Reporting System</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('report') }}">Report a Crime</a>
+            <a href="{{ url_for('admin_panel') }}">Admin</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+        {% if current_user.is_authenticated %}
+        <div style="position: absolute; top: 10px; right: 20px; font-weight: bold; color: #007bff; font-size: 1.1em;">
+            Welcome, {{ current_user.username }}!
+        </div>
+        {% endif %}
+    </header>
+    <div class="container">
+        <h2>Admin Panel</h2>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="flash">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <h3>Users</h3>
+        <ul>
+            {% for user in users %}
+            <li>
+                <b>{{ user.username }}</b> {% if user.is_admin %}(admin){% endif %}
+                {% if not user.is_admin %}
+                <form method="post" action="{{ url_for('delete_user', user_id=user.id) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Delete user {{ user.username }}?')">Delete</button>
+                </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        <h3>Crime Reports</h3>
+        <ul>
+            {% for report in reports %}
+            <li>
+                <b>{{ report.title }}</b> ({{ report.location }}) by {{ report.user.username }}<br>
+                <b>Type:</b> {{ report.crime_type }}<br>
+                <b>Date/Time:</b> {{ report.datetime }}<br>
+                <b>Description:</b> {{ report.description }}<br>
+                {% if report.suspect_description %}<b>Suspect:</b> {{ report.suspect_description }}<br>{% endif %}
+                {% if report.evidence %}<b>Evidence:</b> {{ report.evidence }}<br>{% endif %}
+                {% if report.contact_info %}<b>Contact:</b> {{ report.contact_info }}<br>{% endif %}
+                <b>Status:</b> <span style="color: #007bff; font-weight: 600;">{{ report.status }}</span>
+                <form method="post" action="{{ url_for('update_status', report_id=report.id) }}" style="display:inline; margin-left: 10px;">
+                    <select name="status">
+                        <option value="Pending" {% if report.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="In Progress" {% if report.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Resolved" {% if report.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="Rejected" {% if report.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                    <button type="submit">Update</button>
+                </form>
+                <form method="post" action="{{ url_for('delete_report', report_id=report.id) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Delete this report?')">Delete</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </div>
+</body>
+</html>

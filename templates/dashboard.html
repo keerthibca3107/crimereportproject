@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="/static/style.css">
+        <script src="/static/main.js" defer></script>
+</head>
+<body>
+        <header style="position: relative;">
+                <h1>Crime Reporting System</h1>
+                <nav>
+                        <a href="{{ url_for('index') }}">Home</a>
+                        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('report') }}">Report a Crime</a>
+                        {% if current_user.is_admin %}<a href="{{ url_for('admin_panel') }}">Admin</a>{% endif %}
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                </nav>
+                <div style="position: absolute; top: 10px; right: 20px; font-weight: bold; color: #007bff; font-size: 1.1em;">
+                        Welcome, {{ current_user.username }}!
+                </div>
+        </header>
+        <div class="container">
+                <h2>Dashboard</h2>
+                {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                                {% for message in messages %}
+                                        <div class="flash">{{ message }}</div>
+                                {% endfor %}
+                        {% endif %}
+                {% endwith %}
+                <h3>Your Reports</h3>
+                <ul>
+                        {% for report in reports %}
+                                <li>
+                                                                                <strong>{{ report.title or '' }}</strong> ({{ report.location or '' }}) - {{ report.timestamp or '' }}<br>
+                                                                                <b>Type:</b> {{ report.crime_type or '' }}<br>
+                                                                                <b>Date/Time:</b> {{ report.datetime or '' }}<br>
+                                                                                        <b>Description:</b> {{ report.description or '' }}<br>
+                                                                                        {% if report.suspect_description %}<b>Suspect:</b> {{ report.suspect_description }}<br>{% endif %}
+                                                                                        {% if report.evidence %}<b>Evidence:</b> {{ report.evidence }}<br>{% endif %}
+                                                                                        {% if report.contact_info %}<b>Contact:</b> {{ report.contact_info }}<br>{% endif %}
+                                                                                        <b>Status:</b> <span style="color: #007bff; font-weight: 600;">{{ report.status or '' }}</span><br>
+                                </li>
+                        {% else %}
+                                <li>No reports found.</li>
+                        {% endfor %}
+                </ul>
+        </div>
+</body>
+</html>

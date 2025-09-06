@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <title>Report a Crime</title>
+        <link rel="stylesheet" href="/static/style.css">
+        <script src="/static/main.js" defer></script>
+</head>
+<body>
+        <header style="position: relative;">
+                <h1>Crime Reporting System</h1>
+                <nav>
+                        <a href="{{ url_for('index') }}">Home</a>
+                        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('report') }}">Report a Crime</a>
+                        {% if current_user.is_admin %}<a href="{{ url_for('admin_panel') }}">Admin</a>{% endif %}
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                </nav>
+                {% if current_user.is_authenticated %}
+                <div style="position: absolute; top: 10px; right: 20px; font-weight: bold; color: #007bff; font-size: 1.1em;">
+                        Welcome, {{ current_user.username }}!
+                </div>
+                {% endif %}
+        </header>
+        <div class="container">
+                <h2>Report a Crime</h2>
+                {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                                {% for message in messages %}
+                                        <div class="flash">{{ message }}</div>
+                                {% endfor %}
+                        {% endif %}
+                {% endwith %}
+                <form method="post">
+                        <input type="text" name="title" placeholder="Title" required>
+                        <input type="text" name="location" placeholder="Location" required>
+                        <select name="crime_type" required>
+                                <option value="">Select Crime Type</option>
+                                <option value="Theft">Theft</option>
+                                <option value="Assault">Assault</option>
+                                <option value="Fraud">Fraud</option>
+                                <option value="Vandalism">Vandalism</option>
+                                <option value="Drugs">Drugs</option>
+                                <option value="Other">Other</option>
+                        </select>
+                        <input type="datetime-local" name="datetime" required>
+                        <textarea name="description" placeholder="Description" required></textarea>
+                        <textarea name="suspect_description" placeholder="Suspect Description (optional)"></textarea>
+                        <textarea name="evidence" placeholder="Evidence/Attachment (optional)"></textarea>
+                        <input type="text" name="contact_info" placeholder="Contact Phone/Email (optional)">
+                        <button type="submit">Submit Report</button>
+                </form>
+                <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+        </div>
+</body>
+</html>
